@@ -19,7 +19,9 @@ object ArturiaMk3 {
 //        device!!.receiver.send(createSysexMessageFromBuffer(getSysExMessage(getInitializationMessage())), -1)
 
         Thread.startVirtualThread {
-            animatePads(0, 255, 0)
+//            animatePads(0, 255, 0)
+//            animateCenterPulse(0, 255, 0)
+            animateRainbowWave()
         }
     }
 
@@ -55,25 +57,6 @@ object ArturiaMk3 {
         log("Disconnected from MIDI Device", LogType.SUCCESS)
     }
 
-    fun fadeIn(button: Button, r: Int, g: Int, b: Int, steps: Int = 10, delay: Long = 10) {
-        for (i in 0..steps) {
-            val rStep = (r * i) / steps
-            val gStep = (g * i) / steps
-            val bStep = (b * i) / steps
-            setButtonColor(button, rStep, gStep, bStep)
-            Thread.sleep(delay)
-        }
-    }
-
-    fun fadeOut(button: Button, steps: Int = 10, delay: Long = 10) {
-        val currentG = 255
-        for (i in steps downTo 0) {
-            val gStep = (currentG * i) / steps
-            setButtonColor(button, 0, gStep, 0)
-            Thread.sleep(delay)
-        }
-    }
-
     fun animatePads(r: Int, g: Int, b: Int, fadeSteps: Int = 10, delay: Long = 10) {
         setAllPadsColor(0, 0, 0)
 
@@ -106,5 +89,102 @@ object ArturiaMk3 {
         }
     }
 
+    fun animateRainbowWave(fadeSteps: Int = 10, delay: Long = 10) {
+        setAllPadsColor(0, 0, 0)
 
+        val padPairs = listOf(
+            Pair(Button.PAD_4, Button.PAD_5),
+            Pair(Button.PAD_3, Button.PAD_6),
+            Pair(Button.PAD_2, Button.PAD_7),
+            Pair(Button.PAD_1, Button.PAD_8)
+        )
+
+        var hueOffset = 0.0
+
+        while (true) {
+            val currentColor = hslToRgb((hueOffset % 360.0), 1.0, 0.5)
+            val r = currentColor.red
+            val g = currentColor.green
+            val b = currentColor.blue
+
+            for (i in 0..fadeSteps) {
+                val rStep = (r * i) / fadeSteps
+                val gStep = (g * i) / fadeSteps
+                val bStep = (b * i) / fadeSteps
+                setButtonColor(padPairs[0].first, rStep, gStep, bStep)
+                setButtonColor(padPairs[0].second, rStep, gStep, bStep)
+                Thread.sleep(delay)
+            }
+
+            for (pairIndex in 1 until padPairs.size) {
+                val currentPair = padPairs[pairIndex]
+                val previousPair = padPairs[pairIndex - 1]
+
+                for (i in 0..fadeSteps) {
+                    val rIn = (r * i) / fadeSteps
+                    val gIn = (g * i) / fadeSteps
+                    val bIn = (b * i) / fadeSteps
+
+                    val rOut = (r * (fadeSteps - i)) / fadeSteps
+                    val gOut = (g * (fadeSteps - i)) / fadeSteps
+                    val bOut = (b * (fadeSteps - i)) / fadeSteps
+
+                    setButtonColor(currentPair.first, rIn, gIn, bIn)
+                    setButtonColor(currentPair.second, rIn, gIn, bIn)
+                    setButtonColor(previousPair.first, rOut, gOut, bOut)
+                    setButtonColor(previousPair.second, rOut, gOut, bOut)
+
+                    Thread.sleep(delay)
+                }
+            }
+
+            val lastPair = padPairs.last()
+            for (i in fadeSteps downTo 0) {
+                val rStep = (r * i) / fadeSteps
+                val gStep = (g * i) / fadeSteps
+                val bStep = (b * i) / fadeSteps
+                setButtonColor(lastPair.first, rStep, gStep, bStep)
+                setButtonColor(lastPair.second, rStep, gStep, bStep)
+                Thread.sleep(delay)
+            }
+
+            hueOffset += 25.0
+            Thread.sleep(429)
+        }
+    }
+
+    fun animateCenterPulse(r: Int, g: Int, b: Int, fadeSteps: Int = 10, delay: Long = 10) {
+        setAllPadsColor(0, 0, 0)
+
+        val padPairs = listOf(
+            Pair(Button.PAD_4, Button.PAD_5),
+            Pair(Button.PAD_3, Button.PAD_6),
+            Pair(Button.PAD_2, Button.PAD_7),
+            Pair(Button.PAD_1, Button.PAD_8)
+        )
+
+        while (true) {
+            padPairs.forEach { (pad1, pad2) ->
+                for (i in 0..fadeSteps) {
+                    val gStep = (g * i) / fadeSteps
+                    setButtonColor(pad1, 0, gStep, 0)
+                    setButtonColor(pad2, 0, gStep, 0)
+                    Thread.sleep(delay)
+                }
+            }
+
+            Thread.sleep(250)
+
+            padPairs.reversed().forEach { (pad1, pad2) ->
+                for (i in fadeSteps downTo 0) {
+                    val gStep = (g * i) / fadeSteps
+                    setButtonColor(pad1, 0, gStep, 0)
+                    setButtonColor(pad2, 0, gStep, 0)
+                    Thread.sleep(delay)
+                }
+            }
+
+            Thread.sleep(250)
+        }
+    }
 }
