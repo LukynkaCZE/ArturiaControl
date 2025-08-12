@@ -5,15 +5,17 @@ import io.netty.buffer.Unpooled
 
 fun getInitializationMessage(): ByteBuf {
     val buffer = Unpooled.buffer()
+    // no clue what these bytes are
     buffer.writeByte(0x00)
     buffer.writeByte(0x20)
     buffer.writeByte(0x6B)
     buffer.writeByte(0x7F)
+    // arturia brand id
     buffer.writeByte(0x42)
     buffer.writeByte(0x02)
     buffer.writeByte(0x02)
-    buffer.writeByte(0x40)
-    buffer.writeByte(0x6A)
+    buffer.writeByte(0x40) // no clue
+    buffer.writeByte(0x6A) // no clue
     buffer.writeByte(0x21) // 21 - Arturia, 20 - DAW
     return buffer
 }
@@ -36,14 +38,14 @@ class SetColorMessage(
     constructor(id: Int, red: Int, green: Int, blue: Int): this(Button.entries[id], red, green, blue)
 
     fun write(buffer: ByteBuf) {
-        buffer.writeByte(0x00)
-        buffer.writeByte(0x20)
-        buffer.writeByte(0x6B)
-        buffer.writeByte(0x7F)
-        buffer.writeByte(0x42)
-        buffer.writeByte(0x02)
-        buffer.writeByte(0x02)
-        buffer.writeByte(0x16)
+        buffer.writeByte(0x00) // no clue
+        buffer.writeByte(0x20) // no clue
+        buffer.writeByte(0x6B) // no clue
+        buffer.writeByte(0x7F) // no clue
+        buffer.writeByte(0x42) // brand
+        buffer.writeByte(0x02) // brand
+        buffer.writeByte(0x02) // brand
+        buffer.writeByte(0x16) // no clue
         buffer.writeByte(id.ordinal) // button id
         buffer.writeByte(red) // red
         buffer.writeByte(green) // green
