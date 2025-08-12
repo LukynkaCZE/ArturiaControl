@@ -16,7 +16,7 @@ object ArturiaMk3 {
 
         device!!.open()
         log("Connected to device ${device!!.deviceInfo.name} (${deviceInfo.vendor} ${deviceInfo.version}", LogType.SUCCESS)
-        device!!.receiver.send(createSysexMessageFromBuffer(getSysExMessage(getInitializationMessage())), -1)
+//        device!!.receiver.send(createSysexMessageFromBuffer(getSysExMessage(getInitializationMessage())), -1)
 
         Thread.startVirtualThread {
             animatePads(0, 255, 0)
@@ -65,9 +65,7 @@ object ArturiaMk3 {
         }
     }
 
-    // New function to fade a button out to black
     fun fadeOut(button: Button, steps: Int = 10, delay: Long = 10) {
-        // We assume the button is currently fully lit with green
         val currentG = 255
         for (i in steps downTo 0) {
             val gStep = (currentG * i) / steps
@@ -77,7 +75,7 @@ object ArturiaMk3 {
     }
 
     fun animatePads(r: Int, g: Int, b: Int, fadeSteps: Int = 10, delay: Long = 10) {
-        setAllPadsColor(0, 0, 0) // Start with all pads off
+        setAllPadsColor(0, 0, 0)
 
         for (i in 0..fadeSteps) {
             val gStep = (g * i) / fadeSteps
@@ -101,7 +99,6 @@ object ArturiaMk3 {
             }
         }
 
-        // Finally, after the main loop, fade out the very last pad
         for (i in fadeSteps downTo 0) {
             val gStep = (g * i) / fadeSteps
             setButtonColor(Button.PAD_8, 0, gStep, 0)
