@@ -53,17 +53,17 @@ class SetColorMessage(
     }
 }
 
-enum class Button(val hex: Byte) {
-    SHIFT(0),
-    OCTAVE_MINUS(1),
-    HOLD(2),
-    OCTAVE_PLUS(3),
-    PAD_1(4),
-    PAD_2(5),
-    PAD_3(6),
-    PAD_4(7),
-    PAD_5(8),
-    PAD_6(9),
-    PAD_7(0x0A),
-    PAD_8(0x0B);
+enum class Button {
+    SHIFT,
+    OCTAVE_MINUS,
+    HOLD,
+    OCTAVE_PLUS,
+    PAD_1,
+    PAD_2,
+    PAD_3,
+    PAD_4,
+    PAD_5,
+    PAD_6,
+    PAD_7,
+    PAD_8;
 }
